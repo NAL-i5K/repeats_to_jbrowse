@@ -37,4 +37,4 @@ Run the workflow with cwltool:
 cwltool repeatmodeler_workflow.cwl repeatmodeler_params.yml
 ```
 
-The workflow first runs [remodel-repeats.py](../remodel-repeats.py) on the input GFF3 file, then runs `flatfile-to-json.pl` inside the supplied JBrowse1 container.
+The workflow first runs [tools/remodel-repeats.py](/Users/mpoelchau/Documents/programs/repeats_to_jbrowse/tools/remodel-repeats.py) on the input GFF3 file, then runs `flatfile-to-json.pl` inside the supplied JBrowse1 container.

@@ -43,6 +43,6 @@ steps:
             in_track_key: track_name
             in_json_directory:
                 source: jbrowse_directory
-                valueFrom: $(self ? self : 'repeatmodeler_json_tracks')
+                valueFrom: "$(self ? self : 'repeatmodeler_json_tracks')"
         out:
             [out_json_tracks]

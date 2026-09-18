@@ -11,7 +11,7 @@ inputs:
         type: File
         default:
             class: File
-            path: ../../remodel-repeats.py
+            location: remodel-repeats.py
         inputBinding:
             position: 1
 
