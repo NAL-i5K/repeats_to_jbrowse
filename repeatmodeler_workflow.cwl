@@ -1,10 +1,6 @@
 cwlVersion: v1.2
 class: Workflow
 
-requirements:
-    StepInputExpressionRequirement: {}
-    InlineJavascriptRequirement: {}
-
 inputs:
     repeat_annotations: File
     singularity_image: string
@@ -45,7 +41,6 @@ steps:
             in_publication_status: publication_status
             in_track_label: track_name
             in_track_key: track_name
-            in_json_directory: repeatmodeler_json_tracks
         out:
             [out_json_tracks]
 

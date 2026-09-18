@@ -28,6 +28,7 @@ inputs:
 
     in_json_directory:
         type: string
+        default: repeatmodeler_json_tracks
         inputBinding:
             prefix: --out
             position: 5
