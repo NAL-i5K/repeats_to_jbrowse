@@ -2,6 +2,8 @@
 
 This CWL workflow takes a RepeatModeler or EarlGrey GFF3 file, rewrites it into a JBrowse1-friendly parent/child structure, and converts the result into a JBrowse JSON track directory.
 
+This workflow was written with GitHub Copilot using GPT-5.4 mini.
+
 ## Inputs
 
 The workflow accepts a YAML file with these inputs:

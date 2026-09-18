@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Run flatfile-to-json.pl with score-based color bins derived from a GFF."""
+#Inspiration for the repeat class coloring function comes from https://github.com/clemgoub/rm2gff3
 
 from __future__ import annotations
 
@@ -196,7 +197,7 @@ def build_track_legend(score_bins: dict[str, object] | None) -> str:
 def build_type_legend() -> str:
     ranges = [f"{name} are {description} ({color})" for name, color, description in TYPE_COLOR_BINS]
     return (
-        "EarlGrey features are colored by the type prefix before any '/'; repeat_region and any other unmapped types are grey. "
+        "EarlGrey features are colored by repeat class; repeat_region and any other unmapped types are grey. "
         + "; ".join(ranges)
         + "."
     )
