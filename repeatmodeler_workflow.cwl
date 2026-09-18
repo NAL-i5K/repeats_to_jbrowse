@@ -16,9 +16,9 @@ inputs:
         default: null
 
 outputs:
-    json_tracks:
-        type: Directory
-        outputSource: convert_gff_to_json/out_json_tracks
+    publish_summary:
+        type: File
+        outputSource: publish_json_tracks/out_publish_summary
 
 steps:
     remodel_repeats:
@@ -50,4 +50,5 @@ steps:
         in:
             source_directory: convert_gff_to_json/out_json_tracks
             destination_directory: jbrowse_directory
-        out: []
+        out:
+            [out_publish_summary]

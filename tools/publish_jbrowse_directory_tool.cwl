@@ -25,4 +25,8 @@ inputs:
         inputBinding:
             position: 3
 
-outputs: {}
+outputs:
+    out_publish_summary:
+        type: File
+        outputBinding:
+            glob: publish-summary.json

@@ -10,6 +10,9 @@ import sys
 from pathlib import Path
 
 
+SUMMARY_FILE = "publish-summary.json"
+
+
 def track_identifier(track: object) -> str | None:
     if not isinstance(track, dict):
         return None
@@ -86,6 +89,28 @@ def publish_directory(source_directory: Path, destination_directory: Path | None
         copy_entry(entry, destination_directory / entry.name)
 
 
+def build_summary(source_directory: Path, destination_directory: Path | None) -> dict[str, object]:
+    summary = {
+        "published": destination_directory is not None,
+        "staged_directory": str(source_directory.resolve()),
+        "staged_directory_name": source_directory.name,
+        "destination_directory": str(destination_directory) if destination_directory is not None else None,
+        "track_list": str(source_directory / "trackList.json"),
+    }
+    if destination_directory is None:
+        summary["note"] = (
+            "jbrowse_directory was not provided; the generated directory was only staged for workflow execution "
+            "and may be cleaned up by cwltool after the workflow finishes."
+        )
+    return summary
+
+
+def write_summary(source_directory: Path, destination_directory: Path | None) -> None:
+    summary_path = Path(SUMMARY_FILE)
+    summary = build_summary(source_directory, destination_directory)
+    summary_path.write_text(json.dumps(summary, indent=2, sort_keys=False) + "\n", encoding="utf-8")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Copy JBrowse output into an optional destination directory.")
     parser.add_argument("source_directory", type=Path, help="Staged JBrowse output directory")
@@ -97,6 +122,7 @@ def main() -> int:
     args = build_parser().parse_args()
     try:
         publish_directory(args.source_directory, args.destination_directory)
+        write_summary(args.source_directory, args.destination_directory)
     except ValueError as error:
         print(f"error: {error}", file=sys.stderr)
         return 2

@@ -27,9 +27,11 @@ jbrowse_directory: /project/nal_genomics/jbrowse/amel/data
 
 `track_name` populates the JBrowse track label and display key.
 
-`jbrowse_directory` is optional. The workflow always stages JSON into `repeatmodeler_json_tracks` in the CWL working directory. If `jbrowse_directory` is provided, it must be an absolute path, and the workflow then copies those generated files into that JBrowse directory.
+`jbrowse_directory` is optional. If it is provided, it must be an absolute path, and the workflow copies the generated files into that JBrowse directory.
 
 When publishing into an existing JBrowse directory, the helper merges `trackList.json` by track label instead of overwriting the whole file.
+
+The workflow now returns a small JSON summary file instead of the full generated directory tree. If `jbrowse_directory` is omitted, the generated JSON directory is only staged internally during workflow execution and may be cleaned up by `cwltool` after the run finishes.
 
 ## Usage
 
@@ -56,7 +58,7 @@ Run the workflow with cwltool:
 cwltool repeatmodeler_workflow.cwl repeatmodeler_params.yml
 ```
 
-`cwltool` writes the workflow output object to standard output when the run completes. For this workflow, that means the generated `json_tracks` directory can be rendered as a large JSON blob. If you want to keep the normal progress logging but suppress that final JSON, redirect standard output and leave standard error alone:
+`cwltool` writes the workflow output object to standard output when the run completes. This workflow now emits a small `publish_summary` file instead of the full JBrowse directory object, so the final JSON is much shorter. If you still want to suppress that final output, redirect standard output and leave standard error alone:
 
 ```bash
 cwltool repeatmodeler_workflow.cwl repeatmodeler_params.yml > /dev/null
