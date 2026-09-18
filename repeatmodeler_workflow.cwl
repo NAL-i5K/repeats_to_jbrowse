@@ -4,6 +4,9 @@ class: Workflow
 inputs:
     repeat_annotations: File
     singularity_image: string
+    annotation_source:
+        type: string
+        default: EarlGrey
     data_provider: string
     data_source: string
     data_description: string
@@ -26,6 +29,7 @@ steps:
         run:
             tools/remodel_repeats_tool.cwl
         in:
+            annotation_source: annotation_source
             in_gff: repeat_annotations
         out:
             [out_gff]
@@ -34,6 +38,7 @@ steps:
         run:
             tools/gff_to_json_tool.cwl
         in:
+            annotation_source: annotation_source
             singularity_image: singularity_image
             in_gff: remodel_repeats/out_gff
             in_data_provider: data_provider

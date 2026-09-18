@@ -24,12 +24,24 @@ COLOR_BINS = [
     ("#8B0000", "dark red"),
 ]
 DEFAULT_COLOR = "#808080"
+TYPE_COLOR_BINS = [
+    ("LINE", "#3399ff", "blue"),
+    ("SINE", "#800080", "purple"),
+    ("DNA", "#ff6666", "salmon"),
+    ("LTR", "#00cc44", "green"),
+    ("RC", "#ff6600", "orange"),
+    ("Low_complexity", "#d1d1e0", "grey/blue"),
+    ("Satellite", "#ff99ff", "pink"),
+    ("Simple_repeat", "#8686ac", "dark grey/blue"),
+    ("Unknown", "#f2f2f2", "grey"),
+]
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Compute score bins from a GFF file and run flatfile-to-json.pl."
     )
+    parser.add_argument("in_annotation_source", help="Annotation source metadata")
     parser.add_argument("singularity_image", help="Singularity image containing flatfile-to-json.pl")
     parser.add_argument("in_gff", type=Path, help="Input GFF file")
     parser.add_argument("in_track_label", help="Track label")
@@ -133,6 +145,19 @@ def build_color_function(score_bins: dict[str, object] | None) -> str:
     )
 
 
+def build_type_color_function() -> str:
+    type_map = {name: color for name, color, _label in TYPE_COLOR_BINS}
+    type_map["repeat_region"] = type_map["Unknown"]
+    return (
+        "function(feature) { "
+        "var typeValue = feature.get('type') || feature.get('Type') || ''; "
+        "var prefix = typeValue.split('/')[0]; "
+        f"var typeColors = {json.dumps(type_map)}; "
+        f"return typeColors[prefix] || typeColors.Unknown || '{DEFAULT_COLOR}'; "
+        "}"
+    )
+
+
 def build_track_legend(score_bins: dict[str, object] | None) -> str:
     if score_bins is None:
         return "No numeric score values were found in column 6, so numeric features use the default navy color and features without a numeric score are gray."
@@ -168,12 +193,29 @@ def build_track_legend(score_bins: dict[str, object] | None) -> str:
     )
 
 
+def build_type_legend() -> str:
+    ranges = [f"{name} are {description} ({color})" for name, color, description in TYPE_COLOR_BINS]
+    return (
+        "EarlGrey features are colored by the type prefix before any '/'; repeat_region and any other unmapped types are grey. "
+        + "; ".join(ranges)
+        + "."
+    )
+
+
+def normalize_annotation_source(value: str) -> str:
+    normalized = value.strip().lower()
+    if normalized == "repeatmodeler":
+        return "RepeatModeler"
+    return "EarlGrey"
+
+
 def build_command(args: argparse.Namespace) -> list[str]:
-    score_bins = compute_score_bins(collect_scores(args.in_gff))
+    annotation_source = normalize_annotation_source(args.in_annotation_source)
+    score_bins = compute_score_bins(collect_scores(args.in_gff)) if annotation_source == "RepeatModeler" else None
     client_config = {
         "label": "target,name,id",
         "description": "score,note,description",
-        "color": build_color_function(score_bins),
+        "color": build_color_function(score_bins) if annotation_source == "RepeatModeler" else build_type_color_function(),
     }
     config = {
         "category": "Repeat Sequence Analysis/Transposable Elements",
@@ -181,9 +223,10 @@ def build_command(args: argparse.Namespace) -> list[str]:
             "Data description": args.in_data_description,
             "Data provider": args.in_data_provider,
             "Data source": args.in_data_source,
+            "Annotation source": annotation_source,
             "Methods": args.in_materials_and_methods,
             "Publication status": args.in_publication_status,
-            "Track legend": build_track_legend(score_bins),
+            "Track legend": build_track_legend(score_bins) if annotation_source == "RepeatModeler" else build_type_legend(),
         },
     }
 

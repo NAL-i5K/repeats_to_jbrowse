@@ -15,10 +15,15 @@ inputs:
         inputBinding:
             position: 1
 
+    annotation_source:
+        type: string
+        inputBinding:
+            position: 2
+
     in_gff:
         type: File
         inputBinding:
-            position: 2
+            position: 3
 
 outputs:
     out_gff:

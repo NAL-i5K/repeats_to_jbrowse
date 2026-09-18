@@ -16,56 +16,61 @@ inputs:
         inputBinding:
             position: 1
 
-    singularity_image:
+    annotation_source:
         type: string
         inputBinding:
             position: 2
 
+    singularity_image:
+        type: string
+        inputBinding:
+            position: 3
+
     in_gff:
         type: File
         inputBinding:
-            position: 3
+            position: 4
 
     in_track_label:
         type: string
         inputBinding:
-            position: 4
+            position: 5
 
     in_json_directory:
         type: string
         default: repeatmodeler_json_tracks
         inputBinding:
-            position: 5
+            position: 6
 
     in_track_key:
         type: string
         inputBinding:
-            position: 6
+            position: 7
 
     in_data_provider:
         type: string
         inputBinding:
-            position: 7
+            position: 8
 
     in_data_source:
         type: string
         inputBinding:
-            position: 8
+            position: 9
 
     in_data_description:
         type: string
         inputBinding:
-            position: 9
+            position: 10
 
     in_materials_and_methods:
         type: string
         inputBinding:
-            position: 10
+            position: 11
 
     in_publication_status:
         type: string
         inputBinding:
-            position: 11
+            position: 12
 
 outputs:
     out_json_tracks:

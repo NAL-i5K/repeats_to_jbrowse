@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Convert RepeatModeler GFF3 output into a JBrowse1-friendly hierarchy."""
+"""Convert RepeatModeler or EarlGrey GFF3 output into a JBrowse1-friendly hierarchy."""
 
 # Created with GPT-5.4 mini.
 
@@ -76,14 +76,14 @@ def normalize_target_attribute(raw_value: str) -> str | None:
     return "Target=" + " ".join(normalized)
 
 
-def clean_attributes(attributes_text: str, remove_keys: set[str]) -> str:
+def clean_attributes(attributes_text: str, remove_keys: set[str], normalize_target: bool) -> str:
     cleaned_attributes: list[str] = []
     for chunk in attributes_text.split(";"):
         part = chunk.strip()
         if not part:
             continue
 
-        if part == "Target" or part.startswith("Target=") or part.startswith("Target "):
+        if normalize_target and (part == "Target" or part.startswith("Target=") or part.startswith("Target ")):
             normalized_target = normalize_target_attribute(part)
             if normalized_target is not None:
                 cleaned_attributes.append(normalized_target)
@@ -106,28 +106,37 @@ def append_attribute(attributes_text: str, attribute: str) -> str:
     return f"{attributes_text};{attribute}"
 
 
-def transform_feature_line(line: str, feature_id: int) -> list[str]:
+def transform_feature_line(line: str, feature_id: int, annotation_source: str) -> list[str]:
     fields = line.split("\t")
     if len(fields) != 9:
         sys.stderr.write(f"warning: expected 9 tab-delimited columns, leaving line unchanged: {line}\n")
         return [line]
 
-    if fields[2] not in FEATURE_TYPE_INPUTS:
+    source = annotation_source.lower()
+    if source == "repeatmodeler" and fields[2] not in FEATURE_TYPE_INPUTS:
         return [line]
 
     parent_fields = fields.copy()
     child_fields = fields.copy()
 
     parent_fields[2] = FEATURE_TYPE_PARENT
-    child_fields[2] = FEATURE_TYPE_CHILD
+    if source == "repeatmodeler":
+        child_fields[2] = FEATURE_TYPE_CHILD
 
-    parent_fields[8] = append_attribute(clean_attributes(fields[8], remove_keys={"ID", "Parent"}), f"ID={feature_id}")
-    child_fields[8] = append_attribute(clean_attributes(fields[8], remove_keys={"ID", "Parent"}), f"Parent={feature_id}")
+    normalize_target = source == "repeatmodeler"
+    parent_fields[8] = append_attribute(
+        clean_attributes(fields[8], remove_keys={"ID", "Parent"}, normalize_target=normalize_target),
+        f"ID={feature_id}",
+    )
+    child_fields[8] = append_attribute(
+        clean_attributes(fields[8], remove_keys={"ID", "Parent"}, normalize_target=normalize_target),
+        f"Parent={feature_id}",
+    )
 
     return ["\t".join(parent_fields), "\t".join(child_fields)]
 
 
-def process_file(input_path: Path, output_handle) -> tuple[int, int, set[str]]:
+def process_file(input_path: Path, output_handle, annotation_source: str) -> tuple[int, int, set[str]]:
     feature_id = 0
     modified_lines = 0
     added_lines = 0
@@ -140,10 +149,10 @@ def process_file(input_path: Path, output_handle) -> tuple[int, int, set[str]]:
                 continue
 
             fields = line.split("\t")
-            if len(fields) == 9 and fields[2] not in FEATURE_TYPE_INPUTS:
+            if annotation_source.lower() == "repeatmodeler" and len(fields) == 9 and fields[2] not in FEATURE_TYPE_INPUTS:
                 unhandled_feature_types.add(fields[2])
 
-            transformed_lines = transform_feature_line(line, feature_id + 1)
+            transformed_lines = transform_feature_line(line, feature_id + 1, annotation_source)
             if transformed_lines == [line]:
                 output_handle.write(raw_line)
                 continue
@@ -159,8 +168,9 @@ def process_file(input_path: Path, output_handle) -> tuple[int, int, set[str]]:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Convert RepeatModeler GFF3 output into parent/child features for JBrowse1."
+        description="Convert RepeatModeler or EarlGrey GFF3 output into parent/child features for JBrowse1."
     )
+    parser.add_argument("annotation_source", help="Annotation source: RepeatModeler or EarlGrey")
     parser.add_argument("input", type=Path, help="Input GFF3 file")
     parser.add_argument(
         "output",
@@ -174,9 +184,10 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> int:
     parser = build_parser()
     args = parser.parse_args()
+    annotation_source = args.annotation_source.strip()
 
     if args.output is None:
-        modified_lines, added_lines, unhandled_feature_types = process_file(args.input, sys.stdout)
+        modified_lines, added_lines, unhandled_feature_types = process_file(args.input, sys.stdout, annotation_source)
         if unhandled_feature_types:
             print(
                 "warning: input contains feature types not handled by this script: "
@@ -190,7 +201,7 @@ def main() -> int:
         return 0
 
     with args.output.open("w", encoding="utf-8") as output_handle:
-        modified_lines, added_lines, unhandled_feature_types = process_file(args.input, output_handle)
+        modified_lines, added_lines, unhandled_feature_types = process_file(args.input, output_handle, annotation_source)
 
     if unhandled_feature_types:
         print(
