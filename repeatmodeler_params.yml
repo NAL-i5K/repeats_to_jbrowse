@@ -1,10 +1,10 @@
 repeat_annotations:
     class: File
-    path: /Users/mpoelchau/Downloads/test.gff
+    path: /Users/files/test.gff
 singularity_image: /project/nal_genomics/shared_programs/jbrowse_1.16.11--pl5321h9f5acd7_5.sif
-data_provider: "Monica Poelchau, USDA-ARS"
+data_provider: "Test person, USDA-ARS"
 data_source: "doi:/10.adc/1235"
-materials_and_methods: "Repeat Modeler v1.2 was run with default parameters"
-publication_status: "Published"
-track_name: "Ontophagus taurus repeats"
+materials_and_methods: "RepeatModeler v2.0 was run with default parameters"
+publication_status: "Published, please cite doi:10.adc/1235"
+track_name: "Genus_species-Program"
 jbrowse_directory: /project/nal_genomics/jbrowse/amel/data

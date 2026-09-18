@@ -156,7 +156,7 @@ def build_track_legend(score_bins: dict[str, object] | None) -> str:
             )
 
     return (
-        "Scores are divided into 10 equal bins across the observed column 6 range: "
+        "Higher scores are represented by warmer colors: "
         + "; ".join(ranges)
         + ". Features without a numeric score are gray."
     )
