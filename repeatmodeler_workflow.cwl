@@ -1,6 +1,10 @@
 cwlVersion: v1.2
 class: Workflow
 
+requirements:
+    StepInputExpressionRequirement: {}
+    InlineJavascriptRequirement: {}
+
 inputs:
     repeat_annotations: File
     singularity_image: string
