@@ -27,7 +27,9 @@ jbrowse_directory: /project/nal_genomics/jbrowse/amel/data
 
 `track_name` populates the JBrowse track label and display key.
 
-`jbrowse_directory` is optional. The workflow always stages JSON into `repeatmodeler_json_tracks` in the CWL working directory. If `jbrowse_directory` is provided, the workflow then copies those generated files into that JBrowse directory.
+`jbrowse_directory` is optional. The workflow always stages JSON into `repeatmodeler_json_tracks` in the CWL working directory. If `jbrowse_directory` is provided, it must be an absolute path, and the workflow then copies those generated files into that JBrowse directory.
+
+When publishing into an existing JBrowse directory, the helper merges `trackList.json` by track label instead of overwriting the whole file.
 
 ## Usage
 
