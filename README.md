@@ -27,7 +27,7 @@ jbrowse_directory: /project/nal_genomics/jbrowse/amel/data
 
 `track_name` populates the JBrowse track label and display key.
 
-`jbrowse_directory` is optional. If omitted, the workflow writes into `repeatmodeler_json_tracks` in the working directory.
+`jbrowse_directory` is optional. The workflow always stages JSON into `repeatmodeler_json_tracks` in the CWL working directory. If `jbrowse_directory` is provided, the workflow then copies those generated files into that JBrowse directory.
 
 ## Usage
 
@@ -37,4 +37,4 @@ Run the workflow with cwltool:
 cwltool repeatmodeler_workflow.cwl repeatmodeler_params.yml
 ```
 
-The workflow first runs [tools/remodel-repeats.py](/Users/mpoelchau/Documents/programs/repeats_to_jbrowse/tools/remodel-repeats.py) on the input GFF3 file, then runs `flatfile-to-json.pl` inside the supplied JBrowse1 container.
+The workflow first runs [tools/remodel-repeats.py](/Users/mpoelchau/Documents/programs/repeats_to_jbrowse/tools/remodel-repeats.py) on the input GFF3 file, then runs `flatfile-to-json.pl` inside the supplied JBrowse1 container, and finally copies the generated JSON files into `jbrowse_directory` when that optional input is supplied.

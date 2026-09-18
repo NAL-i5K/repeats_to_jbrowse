@@ -45,8 +45,14 @@ steps:
             in_publication_status: publication_status
             in_track_label: track_name
             in_track_key: track_name
-            in_json_directory:
-                source: jbrowse_directory
-                valueFrom: "$(self ? self : 'repeatmodeler_json_tracks')"
+            in_json_directory: repeatmodeler_json_tracks
         out:
             [out_json_tracks]
+
+    publish_json_tracks:
+        run:
+            tools/publish_jbrowse_directory_tool.cwl
+        in:
+            source_directory: convert_gff_to_json/out_json_tracks
+            destination_directory: jbrowse_directory
+        out: []
