@@ -37,6 +37,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("in_track_key", help="Track key")
     parser.add_argument("in_data_provider", help="Data provider metadata")
     parser.add_argument("in_data_source", help="Data source metadata")
+    parser.add_argument("in_data_description", help="Data description metadata")
     parser.add_argument("in_materials_and_methods", help="Methods metadata")
     parser.add_argument("in_publication_status", help="Publication status metadata")
     return parser
@@ -70,6 +71,10 @@ def format_score(value: float) -> str:
     return text
 
 
+def round_score(value: float) -> int:
+    return int(round(value))
+
+
 def compute_score_bins(scores: list[float]) -> dict[str, object] | None:
     if not scores:
         return None
@@ -77,15 +82,16 @@ def compute_score_bins(scores: list[float]) -> dict[str, object] | None:
     min_score = min(scores)
     max_score = max(scores)
     if math.isclose(min_score, max_score):
+        rounded_score = round_score(min_score)
         return {
             "min_score": min_score,
             "max_score": max_score,
-            "cutoffs": [min_score] * (len(COLOR_BINS) - 1),
+            "cutoffs": [rounded_score] * (len(COLOR_BINS) - 1),
             "constant": True,
         }
 
     step = (max_score - min_score) / len(COLOR_BINS)
-    cutoffs = [min_score + (step * index) for index in range(1, len(COLOR_BINS))]
+    cutoffs = [round_score(min_score + (step * index)) for index in range(1, len(COLOR_BINS))]
     return {
         "min_score": min_score,
         "max_score": max_score,
@@ -172,7 +178,7 @@ def build_command(args: argparse.Namespace) -> list[str]:
     config = {
         "category": "Repeat Sequence Analysis/Transposable Elements",
         "metadata": {
-            "Data description": "RepeatModeler annotations converted for JBrowse1",
+            "Data description": args.in_data_description,
             "Data provider": args.in_data_provider,
             "Data source": args.in_data_source,
             "Methods": args.in_materials_and_methods,
@@ -186,6 +192,8 @@ def build_command(args: argparse.Namespace) -> list[str]:
         "exec",
         args.singularity_image,
         "flatfile-to-json.pl",
+        "--trackType",
+        "CanvasFeatures",
         "--gff",
         str(args.in_gff),
         "--trackLabel",

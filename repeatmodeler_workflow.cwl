@@ -6,6 +6,7 @@ inputs:
     singularity_image: string
     data_provider: string
     data_source: string
+    data_description: string
     materials_and_methods: string
     publication_status: string
     track_name: string
@@ -37,6 +38,7 @@ steps:
             in_gff: remodel_repeats/out_gff
             in_data_provider: data_provider
             in_data_source: data_source
+            in_data_description: data_description
             in_materials_and_methods: materials_and_methods
             in_publication_status: publication_status
             in_track_label: track_name

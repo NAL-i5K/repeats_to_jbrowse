@@ -52,15 +52,20 @@ inputs:
         inputBinding:
             position: 8
 
-    in_materials_and_methods:
+    in_data_description:
         type: string
         inputBinding:
             position: 9
 
-    in_publication_status:
+    in_materials_and_methods:
         type: string
         inputBinding:
             position: 10
+
+    in_publication_status:
+        type: string
+        inputBinding:
+            position: 11
 
 outputs:
     out_json_tracks:
