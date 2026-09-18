@@ -19,7 +19,7 @@ data_source: "doi:/10.adc/1235"
 data_description: "Repeat annotations converted for JBrowse1"
 materials_and_methods: "Repeat Modeler v1.2 was run with default parameters"
 publication_status: "Published, please cite doi:/10.adc/1235"
-track_name: "Repeat trakcs "
+track_name: "Apis-mellifera-repetitive-elements"
 jbrowse_directory: /project/nal_genomics/jbrowse/amel/data
 ```
 
